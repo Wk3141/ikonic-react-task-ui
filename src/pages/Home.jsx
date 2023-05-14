@@ -6,6 +6,8 @@ import {
   sendRequest,
   successToast,
 } from "../helper/utils";
+import { useSelector,useDispatch } from "react-redux";
+import { buttonDisable,buttonEnable } from "../reducer/authReducer";
 
 export default function Home() {
   const navigate = useNavigate()
@@ -13,6 +15,8 @@ export default function Home() {
   const [description, setDescription] = useState("");
   const [posts, setPosts] = useState([]);
   const [selectPost, setSelectedPost] = useState("");
+  const dispatch = useDispatch()
+  
 
   const handleTitleChange = (event) => {
     setTitle(event.target.value);
@@ -27,6 +31,7 @@ export default function Home() {
 
     const formData = { title, description };
     if (selectPost?._id) {
+      dispatch(buttonDisable());
       const response = await sendRequest(
         `${BASE_URL}/post/update/${selectPost._id}`,
         {
@@ -36,15 +41,21 @@ export default function Home() {
       );
 
       if (response.status === 200) {
+        dispatch(buttonEnable());
         successToast(response.data?.desc);
         getAllPOSt();
       } else {
         errorToast(response.data?.desc);
       }
     } else {
+
+      
+    dispatch(buttonDisable());
+     
       const response = await sendRequest(BASE_URL + "/post/create", {
         payload: formData,
       });
+      dispatch(buttonEnable());
 
       if (response.status === 200) {
         successToast(response.data?.desc);
@@ -187,8 +198,8 @@ export default function Home() {
                         <span className="badge bg-success ">Add Comment</span>
                       </div>
                     </li>
-                    <li className="list-group-item">A second item</li>
-                    <li className="list-group-item">A third item</li>
+                    <li className="list-group-item">Comment 1</li>
+                    <li className="list-group-item">Comment 2</li>
                   </ul>
                 </div>
               );

@@ -6,14 +6,19 @@ import {
   successToast,
 } from "../helper/utils";
 import { useNavigate } from "react-router-dom";
+import { useSelector,useDispatch } from "react-redux";
+import { buttonDisable,buttonEnable } from "../reducer/authReducer";
 
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const dispatch = useDispatch()
+
   const handleLogin = async (e) => {
     e.preventDefault();
+    dispatch(buttonDisable());
 
 
     let formData = {
@@ -23,7 +28,7 @@ export default function Login() {
     const response = await sendRequest(BASE_URL + "/login", {
       payload: formData,
     });
-
+    dispatch(buttonEnable());
     if (response.status === 200) {
 
       const user_data = {
