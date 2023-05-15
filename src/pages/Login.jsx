@@ -36,6 +36,7 @@ export default function Login() {
         name: response.data?.result?.name || "",
         email: response.data?.result?.email || "",
         role :response.data?.result?.role || "",
+        id : response.data?.result?._id || "",
       };
       localStorage.setItem("user_data", JSON.stringify(user_data));
       successToast(response.data?.desc);

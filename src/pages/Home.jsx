@@ -6,17 +6,17 @@ import {
   sendRequest,
   successToast,
 } from "../helper/utils";
-import { useSelector,useDispatch } from "react-redux";
-import { buttonDisable,buttonEnable } from "../reducer/authReducer";
+import { useSelector, useDispatch } from "react-redux";
+import { buttonDisable, buttonEnable } from "../reducer/authReducer";
 
 export default function Home() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [posts, setPosts] = useState([]);
   const [selectPost, setSelectedPost] = useState("");
-  const dispatch = useDispatch()
-  
+  const dispatch = useDispatch();
+  const storedUser = JSON.parse(localStorage.getItem("user_data"));
 
   const handleTitleChange = (event) => {
     setTitle(event.target.value);
@@ -48,10 +48,8 @@ export default function Home() {
         errorToast(response.data?.desc);
       }
     } else {
+      dispatch(buttonDisable());
 
-      
-    dispatch(buttonDisable());
-     
       const response = await sendRequest(BASE_URL + "/post/create", {
         payload: formData,
       });
@@ -104,13 +102,10 @@ export default function Home() {
     }
   };
 
-  const logout = (()=>{
-
-
+  const logout = () => {
     localStorage.clear();
-    navigate("/")
-
-  })
+    navigate("/");
+  };
 
   useEffect(() => {
     getAllPOSt();
@@ -118,15 +113,20 @@ export default function Home() {
 
   return (
     <div className="container">
-    
       <div className="row d-flex justify-content-center align-item-center">
         <div className="col-6  mt-2">
           <div className="card">
             <div className="card-header bg-primary text-white">
               <div className="d-flex justify-content-between">
                 <div> Add Post</div>
-                <button type="button" className="btn btn-danger" onClick={logout} > Logout</button>
-              
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={logout}
+                >
+                  {" "}
+                  Logout
+                </button>
               </div>
             </div>
             <div className="card-body">
@@ -164,37 +164,41 @@ export default function Home() {
 
           {posts.length > 0 &&
             posts.map((post) => {
+              console.log(storedUser.id, "AAAAA.................");
+              console.log(post.userID?._id, "AAAwwwwwwAA.................");
               return (
                 <div className="card  mt-1 bg-primary">
                   <ul className="list-group list-group-flush">
                     <li className="list-group-item">
                       <div className="d-flex justify-content-between">
                         <span className="badge bg-primary text-capitalize">
-                          {" "}
                           {post.userID?.name}
                         </span>
                       </div>
                       <h1 className="text-capitalize">{post.title}</h1>
                       <p>{post.description}</p>
                       <div className="d-flex justify-content-between">
-                        {post.userID?.role == "admin" && (
-                          <>
-                            <span
-                              className="badge bg-warning"
-                              type="button"
-                              onClick={() => handleEdit(post._id)}
-                            >
-                              Edit Post
-                            </span>
-                            <span
-                              className="badge bg-danger"
-                              type="button"
-                              onClick={() => handleDelete(post._id)}
-                            >
-                              Delete Post
-                            </span>
-                          </>
-                        )}
+                        {(post.userID?.role === "admin" ||
+                          post.userID?._id.toString() ===
+                            storedUser.id?.toString()) && 
+                            <>
+                              <span
+                                className="badge bg-warning"
+                                type="button"
+                                onClick={() => handleEdit(post._id)}
+                              >
+                                Edit Post
+                              </span>
+                              <span
+                                className="badge bg-danger"
+                                type="button"
+                                onClick={() => handleDelete(post._id)}
+                              >
+                                Delete Post
+                              </span>
+                            </>
+                          }
+
                         <span className="badge bg-success ">Add Comment</span>
                       </div>
                     </li>
